@@ -28,7 +28,6 @@
 		},
 		
 		serializeObject: function(model, opts) {
-			// based on form2object http://code.google.com/p/form2js/
 			// options: delimiter, prefix
 			
 			var options = opts || {},
@@ -76,8 +75,10 @@
 							currResult = arrays[arrName][arrIdx];
 						} else {
 							if (j < namePartsLen - 1) {
-								currResult[namePart] = currResult[namePart] || {};
+								if (!currResult[namePart]) currResult[namePart] = {};
+								currResult = currResult[namePart];
 							} else {
+								//currResult[namePart] = field.value;
 								setValue(currResult, field, namePart);
 							}
 						}
@@ -85,6 +86,10 @@
 				}
 			}
 			$.extend(model, result);
+			
+			function getAfterFirstDelimiter(text) {
+				return text.slice(text.indexOf(delimiter) + 1);
+			}
 
 			function setValue(obj, field, name) {
 				switch (field.elem.type) {
