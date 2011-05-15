@@ -11,13 +11,11 @@
 				return this.elements ? jQuery.makeArray( this.elements ) : this;
 			})
 			.filter(function(){
-				return this.name 
-					   && !this.disabled 
+				return this.name && !this.disabled 
 					   && (rselectTextarea.test(this.nodeName) || rinput.test(this.type) || rcheckbox.test(this.type));
 			})
 			.map(function( i, elem ) {
 				var val = $(this).val();
-
 				return val == null ?
 					null :
 					jQuery.isArray( val ) ?
@@ -29,38 +27,80 @@
 			.get();
 		},
 		
-		serializeObject: function(model, options) {
-			var jform = $(this),
+		serializeObject: function(model, opts) {
+			// based on form2object http://code.google.com/p/form2js/
+			// options: delimiter, prefix
+			
+			var options = opts || {},
+				delimiter = options.delimiter || '.',
+				jform = $(this),
 				form = jform.serializeObjectArray(),
+				result = {},
+				arrays = [],
 				i, len;
 			for (i = 0, len = form.length; i < len; i++) {
-				field = form[i];
-				extract(model, field.elem, field.name, field.value);
+				var field = form[i];
+				if (field.value === '') continue;
+				var currResult = result,
+					name = options.prefix ? getAfterFirstDelimiter(field.name) : field.name,
+					nameParts = name.split(delimiter),
+					j, namePartsLen;
+				
+				for (j = 0, namePartsLen = nameParts.length; j < namePartsLen; j++) {
+					var namePart = nameParts[j],
+						bracketPos = namePart.indexOf('['),
+						arrName;
+					if (namePart.indexOf('[]') > -1 && j == namePartsLen - 1) {
+						arrName = namePart.substr(0, namePart.indexOf('['));
+						if (!currResult[arrName]) currResult[arrName] = [];
+						currResult[arrName].push(field.value);
+					} else {
+						if (namePart.indexOf('[') > -1) {
+							var arrIdx = namePart.replace(/^[a-z]+\[|\]$/gi, '');
+							
+							arrName = namePart.substr(0, bracketPos);
+							arrays[arrName] = arrays[arrName] || {};
+							currResult[arrName] = currResult[arrName] || [];
+							if (j == namePartsLen - 1)
+							{
+								currResult[arrName].push(field.value);
+							}
+							else
+							{
+								if (!arrays[arrName][arrIdx])
+								{
+									currResult[arrName].push({});
+									arrays[arrName][arrIdx] = currResult[arrName][currResult[arrName].length - 1];
+								}
+							}
+							currResult = arrays[arrName][arrIdx];
+						} else {
+							if (j < namePartsLen - 1) {
+								currResult[namePart] = currResult[namePart] || {};
+							} else {
+								setValue(currResult, field, namePart);
+							}
+						}
+					}					
+				}
 			}
+			$.extend(model, result);
+
+			function setValue(obj, field, name) {
+				switch (field.elem.type) {
+					case 'checkbox':
+						return obj[name] = field.elem.checked;
+					default:
+						return obj[name] = field.value;
+				}
+			}
+			
+			
+			
 			return jform;
 		}
 	});
 	
-	function extract(obj, elem, name, value) {
-		if (obj == null) return;
-		var nameParts = name.split('.'),
-			length = nameParts.length;
-		if (length > 1) {
-			var newName = nameParts.slice(1, length).join('.'),
-				newObj = obj[nameParts[0]] || {};
-			return extract(newObj, elem, newName, value);
-		} else {
-			return setValue(elem, obj, name, value);
-		}
-	}
 	
-	function setValue(elem, obj, name, value) {
-		switch (elem.type) {
-			case 'checkbox':
-				return obj[name] = elem.checked;
-			default:
-				return obj[name] = value;
-		}
-	}
 
 })(jQuery);
