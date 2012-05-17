@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>jquery.serializeObject Tests Suite</title>
+	<link rel="stylesheet" href="vendor/qunit.css" />
+	<script src="vendor/jquery-1.7.1.js"></script>
+	<script src="vendor/qunit.js"></script>
+	<script src="../jquery.serializeObject.js"></script>
+	<script src="serializeObject.js"></script>
+</head>
+<body>
+	<h1 id="qunit-header">jquery.serializeObject Test Suite</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">
+		<form action="" method="post" id="productForm">
+			<input type="hidden" name="product.id" value="123456" />
+			<input type="text" name="product.name" value="Apple" />
+			<input type="text" name="product.type" value="Fruit" />
+			<input type="checkbox" name="product.active" checked="checked" />
+			<input type="checkbox" name="product.soldout" />
+			<input type="text" name="product.brands[0]" value="Golden Gala" />
+			<input type="text" name="product.brands[1]" value="Red Delicious" />
+		</form>
+	</div>
+</body>
+</html>
