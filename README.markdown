@@ -37,6 +37,6 @@ The result is:
 	}
 ```
 
-===========================
+---
 
-Arti Sinani
+Copyright &copy; 2010-2012 Artan Sinani
