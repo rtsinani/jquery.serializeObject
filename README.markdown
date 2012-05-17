@@ -1,4 +1,4 @@
-A jQuery plugin that serializes a form into an object. The object can be passed to an ajax call as `data` to be processed on the server side.
+A jQuery plugin that serializes a form into an object. The object can then be passed to an ajax call as `data` to be processed on the server side.
 
 ### Usage
 
